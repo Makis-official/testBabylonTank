@@ -1,15 +1,13 @@
-// Babylon.js доступен глобально через объект BABYLON
-
 const canvas = document.getElementById("renderCanvas");
 const engine = new BABYLON.Engine(canvas, true);
 
 const createScene = async function () {
     const scene = new BABYLON.Scene(engine);
 
-    // Создание XR-опыта (дополненная реальность)
+    // Инициализация WebXR
     const xr = await scene.createDefaultXRExperienceAsync({
         uiOptions: {
-            sessionMode: "immersive-ar", // Режим дополненной реальности
+            sessionMode: "immersive-ar",
         },
     });
 
@@ -18,27 +16,23 @@ const createScene = async function () {
     const imageTracking = featuresManager.enableFeature(BABYLON.WebXRImageTracking, "latest", {
         images: [
             {
-                src: "t-34-85-srednii-tank-c-orudiem-kalibra-85-mm-razvaliny-osnov.jpg", // Путь к изображению для отслеживания
-                widthInMeters: 0.2, // Ширина изображения в метрах
+                src: "t-34-85-srednii-tank-c-orudiem-kalibra-85-mm-razvaliny-osnov.jpg",
+                widthInMeters: 0.2,
             },
         ],
     });
 
-    // Обработка события обнаружения изображения
+    // Обработка обнаружения изображения
     imageTracking.onTrackableImageFoundObservable.add((image) => {
         console.log("Image found:", image);
 
         // Создание 3D-модели на найденном изображении
-        BABYLON.SceneLoader.ImportMeshAsync(
-            "", // Путь к модели
-            "./", // Директория с моделью
-            "russian_tank_kv-1s (1).glb", // Имя файла модели
-            scene
-        ).then((result) => {
-            const model = result.meshes[0];
-            model.position = image.transformation.position; // Позиция модели на изображении
-            model.scaling.scaleInPlace(0.1); // Масштабирование модели
-        });
+        BABYLON.SceneLoader.ImportMeshAsync("", "path/to/your/model/", "model.gltf", scene)
+            .then((result) => {
+                const model = result.meshes[0];
+                model.position = image.transformation.position;
+                model.scaling.scaleInPlace(0.1);
+            });
     });
 
     return scene;
