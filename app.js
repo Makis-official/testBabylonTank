@@ -4,6 +4,13 @@ const engine = new BABYLON.Engine(canvas, true);
 const createScene = async function () {
     const scene = new BABYLON.Scene(engine);
 
+    // Проверка поддержки WebXR
+    if (!navigator.xr) {
+        console.error("WebXR не поддерживается вашим браузером.");
+        alert("Ваш браузер не поддерживает WebXR. Пожалуйста, используйте Chrome для Android или Safari для iOS.");
+        return scene;
+    }
+
     // Инициализация WebXR
     const xr = await scene.createDefaultXRExperienceAsync({
         uiOptions: {
@@ -11,12 +18,18 @@ const createScene = async function () {
         },
     });
 
+    // Проверка успешности инициализации
+    if (!xr || !xr.baseExperience) {
+        console.error("Не удалось инициализировать WebXR.");
+        return scene;
+    }
+
     // Включение отслеживания изображений
     const featuresManager = xr.baseExperience.featuresManager;
     const imageTracking = featuresManager.enableFeature(BABYLON.WebXRImageTracking, "latest", {
         images: [
             {
-                src: "t-34-85-srednii-tank-c-orudiem-kalibra-85-mm-razvaliny-osnov.jpg",
+                src: "path/to/your/image.png",
                 widthInMeters: 0.2,
             },
         ],
@@ -32,6 +45,9 @@ const createScene = async function () {
                 const model = result.meshes[0];
                 model.position = image.transformation.position;
                 model.scaling.scaleInPlace(0.1);
+            })
+            .catch((error) => {
+                console.error("Ошибка загрузки модели:", error);
             });
     });
 
@@ -45,5 +61,4 @@ createScene().then((scene) => {
 });
 
 window.addEventListener("resize", () => {
-    engine.resize();
-});
+    engine.resize
